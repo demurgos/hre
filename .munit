@@ -1,0 +1,6 @@
+version=src
+src=test
+bin=build/test
+report=build/report
+hxml=test.flash11.hxml
+classPaths=src

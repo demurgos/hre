@@ -1,0 +1,4 @@
+-swf build/test/flash/bin/flash11_test.swf
+-swf-version 11
+--no-output
+-cmd haxelib run openfl build test.flash11.lime flash

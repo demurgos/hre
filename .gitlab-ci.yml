@@ -1,0 +1,28 @@
+image: demurgos/haxe:3.1
+
+before_script:
+  - chmod +x tools/*.sh
+  - make prepare.haxelib
+  - export DEBIAN_FRONTEND=noninteractive
+
+stages:
+  - build
+  - test
+  - deploy
+
+build-flash:
+  stage: build
+  script:
+    - make build
+
+test-flash:
+  stage: test
+  script:
+    - make test
+
+#main.swf:
+#  stage: deploy
+#  script:
+#    - make build
+#  artifacts:
+#    paths:
