@@ -1,4 +1,4 @@
-version=src
+version=0.1.2
 src=test
 bin=build/test
 report=build/report
