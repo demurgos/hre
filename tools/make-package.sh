@@ -7,7 +7,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 # TODO: Do not run tests if --no-test is passed
 #cd "$PROJECT_ROOT"/tools/
 #./test.sh
-#cd "$PROJECT_ROOT"
+cd "$PROJECT_ROOT"
 
 # Absolute path to a random temporary directory
 TMP_ROOT=`mktemp -d`
