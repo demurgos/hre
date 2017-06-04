@@ -8,11 +8,12 @@
     "regular-expression"
   ],
   "description": "Haxe Regular Expressions",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "releasenote": "First release with full compliance with ES7-core regular expressions",
   "contributors": [
     "demurgos"
   ],
+  "classPath": "src",
   "dependencies": {
     "tink_core": "1.6.2"
   }
