@@ -13,6 +13,7 @@
   "contributors": [
     "demurgos"
   ],
+  "classPath": "src",
   "dependencies": {
     "tink_core": "1.6.2"
   }
