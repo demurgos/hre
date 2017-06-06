@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
   <!-- Metadata -->
-  <meta title="RE library" package="hre" version="0.1.2" />
+  <meta title="RE library" package="hre" version="0.1.3" />
   <app file="flash11_test" main="TestMain" swf-version="11"/>
   <window width="640" height="480" fps="40" orientation="landscape" background="#FFFFFF"
           resizable="true"

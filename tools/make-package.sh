@@ -9,8 +9,13 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 #./test.sh
 cd "$PROJECT_ROOT"
 
+./tools/build.sh
+
 # Absolute path to a random temporary directory
 TMP_ROOT=`mktemp -d`
+
+# Read version
+VERSION=`cat VERSION.txt`
 
 # Copy the files to publish
 cp ./LICENSE.md "$TMP_ROOT/LICENSE.md"
@@ -19,7 +24,7 @@ cp ./haxelib.json "$TMP_ROOT/haxelib.json"
 cp -r ./src/ "$TMP_ROOT/src/"
 
 # Archive path
-ARCHIVE_PATH="$PROJECT_ROOT/build/hre.zip"
+ARCHIVE_PATH="$PROJECT_ROOT/build/hre-$VERSION.zip"
 # Build archive
 # cd "$TMP_ROOT" && tar --create --gzip --file="$ARCHIVE_PATH" .
 cd "$TMP_ROOT" && zip --quiet --recurse-paths "$ARCHIVE_PATH" *

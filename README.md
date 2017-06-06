@@ -20,7 +20,7 @@ the baseline is implemented, work on the performance of the engine is also plann
 Install it from haxelib:
 
 ```shell
-haxelib install hre 0.1.2
+haxelib install hre 0.1.3
 ```
 
 ## Usage

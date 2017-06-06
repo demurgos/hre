@@ -8,7 +8,7 @@
     "regular-expression"
   ],
   "description": "Haxe Regular Expressions",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "releasenote": "First release with full compliance with ES7-core regular expressions",
   "contributors": [
     "demurgos"
