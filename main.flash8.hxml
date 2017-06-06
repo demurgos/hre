@@ -1,4 +1,4 @@
--lib tink_core:1.6.2
+-lib tink_core:1.1.2
 -cp src
 -main hre.Main
 -swf-version "8"

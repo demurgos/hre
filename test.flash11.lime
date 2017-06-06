@@ -15,7 +15,7 @@
   <source path="test"/>
   <haxelib name="munit" version="2.1.2"/>
   <haxelib name="openfl" version="3.0.1"/>
-  <haxelib name="tink_core" version="1.6.2"/>
+  <haxelib name="tink_core" version="1.1.2"/>
 
   <!-- Output -->
   <set name="BUILD_DIR" value="build/test/"/>
