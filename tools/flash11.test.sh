@@ -10,9 +10,8 @@ CMD="haxelib run openfl build test.flash11.lime flash" && echo "$CMD" && eval "$
 CMD="rm -rf build/test/firefox-profile/" && echo "$CMD" && eval "$CMD"
 CMD="cp -r tools/firefox-profile-template/ build/test/firefox-profile/" && echo "$CMD" && eval "$CMD"
 set +e
-CMD="haxelib run munit run -browser \"firefox -profile firefox-profile\" -kill-browser -result-exit-code -as3" && echo "$CMD" && eval "$CMD"
+CMD="haxelib run munit run -browser \"xvfb-run firefox -profile firefox-profile\" -kill-browser -result-exit-code -as3" && echo "$CMD" && eval "$CMD"
 echo "------------------------------"
 echo "Summary for as3:"
 cat build/report/test/summary/as3/summary.txt
-echo ""
 echo "------------------------------"

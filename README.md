@@ -4,7 +4,7 @@ Pure Haxe Regular Expression Engine based on ES7-core.
 
 This is a pure Haxe implementation that guarantees full reproducibility of the
 results across all the targets (as opposed to the [EReg](http://api.haxe.org/EReg.html)
-class from the standard library). You should not that to ensure reproducibility
+class from the standard library). You should note that to ensure reproducibility
 across all targets you may get slower results.
 
 Currently, **this library passes all the official ES7 RegExp tests** (see [Test262](https://github.com/tc39/test262/)),
@@ -14,6 +14,8 @@ issues (timeout).
 The next goal would be to introduce some differences with the ES7 spec to use Unicode
 as the primary text representation and support Unicode grapheme clusters. Now that
 the baseline is implemented, work on the performance of the engine is also planned.
+
+Requires Haxe 3.1.
 
 ## Installation
 
