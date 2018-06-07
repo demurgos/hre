@@ -17,10 +17,3 @@ test-flash:
   stage: test
   script:
     - make test
-
-#main.swf:
-#  stage: deploy
-#  script:
-#    - make build
-#  artifacts:
-#    paths:
