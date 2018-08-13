@@ -1,9 +1,6 @@
 package hre;
 
 import haxe.ds.Either;
-import hre.RegExpMatcher.MatcherResult;
-import hre.RegExpMatcher.MatcherState;
-import hre.RegExpMatcher;
 import hre.ast.Alternative;
 import hre.ast.Assertion in AssertionNode;
 import hre.ast.Atom in AtomNode;
@@ -14,7 +11,7 @@ import hre.ast.Disjunction;
 import hre.ast.Pattern;
 import hre.ast.Quantifier;
 import hre.ast.Term in TermNode;
-import tink.core.Error;
+import hre.HreError;
 
 enum MatcherResult {
   Failure;
@@ -60,7 +57,7 @@ class RegExpMatcher {
   public static function evaluatePattern(pattern:Pattern, flags:RegExpFlags):PatternMatcher {
     return function(source:String, index:Int):MatcherResult {
       if (!(index <= source.length)) {
-        throw new Error("Assertion `index <= source.length` failed");
+        throw new HreError("Assertion `index <= source.length` failed");
       }
       var state:MatcherState = new MatcherState();
       state.length = source.length;
@@ -402,8 +399,8 @@ class RegExpMatcher {
             var startCode = start.charCodeAt(0);
             var endCode = end.charCodeAt(0);
             if (state.ignoreCase) {
-              for(i in startCode...endCode+1) {
-                if(cc == RegExpMatcher.canonicalize(state, i)) {
+              for (i in startCode...endCode + 1) {
+                if (cc == RegExpMatcher.canonicalize(state, i)) {
                   matched = true;
                   break;
                 }

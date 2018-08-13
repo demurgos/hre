@@ -1,4 +1,7 @@
--swf build/test/flash/bin/flash11_test.swf
+-lib munit:2.1.2
+-cp src
+-cp test
+-main TestMain
 -swf-version 11
---no-output
--cmd haxelib run openfl build test.flash11.lime flash
+-swf-header 640:480:40:FFFFFF
+-swf build/test.flash11.swf

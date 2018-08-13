@@ -1,7 +1,6 @@
 package hre;
 
 import haxe.ds.Either;
-import hre.ast.Assertion;
 import hre.ast.CharacterClassAtom;
 import hre.ast.Alternative;
 import hre.ast.Assertion in AssertionNode;
@@ -13,13 +12,49 @@ import hre.ast.Pattern;
 import hre.ast.Quantifier;
 import hre.ast.Term in TermNode;
 import hre.tokens.Symbol;
-import hre.RegExpParser;
-import tink.core.Error;
-import tink.core.Pair;
 
-class RegExpSyntaxError extends Error {
+class RegExpSyntaxError extends HreError {
+  public var index(default, null):Int;
+  public var source(default, null):String;
+
   public function new(message:String, index:Int, source:String) {
     super("RegExp syntax error for \"" + source + "\" at index " + index + ": " + message);
+    this.index = index;
+    this.source = source;
+  }
+}
+
+/**
+ * A quantifier prefix is quantifier without the `greedy` field.
+ *
+ * `-1` means "unbounded".
+ *
+ * @internal
+ */
+class QuantifierPrefix {
+  public var min(default, null):Int;
+  public var max(default, null):Int;
+
+  public function new(min: Int, max: Int) {
+    this.min = min;
+    this.max = max;
+  }
+}
+
+/**
+ * Represents an integer literal.
+ *
+ * Used for decimals (quantifiers) and hex (unicode escapes)
+ *
+ * @internal
+ */
+class IntLiteral {
+  public var length(default, null):Int;
+  public var value(default, null):Int;
+
+  public function new(length: Int, value: Int) {
+    this.length = length;
+    this.value = value;
   }
 }
 
@@ -125,7 +160,7 @@ class RegExpParser {
     }
     var oldCapturesCount:Int = this.capturesCount;
 
-    var assertionOrAtom:Either<Assertion, AtomNode> = switch(this.peek()) {
+    var assertionOrAtom:Either<AssertionNode, AtomNode> = switch(this.peek()) {
       case Symbol.EndOfText: throw new RegExpSyntaxError("Unexpected end of text", this.currentIndex, this.source);
       case Symbol.Character(c):
         switch(c) {
@@ -177,9 +212,9 @@ class RegExpParser {
             if (inCharacterClass) {
               throw new RegExpSyntaxError("Invalid decimal escape in character class", this.currentIndex, this.source);
             }
-            var decimal:Pair<Int, Int> = this.readDecimalDigits();
-            var decimalLen:Int = decimal.a;
-            var decimalVal:Int = decimal.b;
+            var decimal:IntLiteral = this.readDecimalDigits();
+            var decimalLen:Int = decimal.length;
+            var decimalVal:Int = decimal.value;
             Escape.Backreference(decimalVal);
           }
         } else {
@@ -237,16 +272,16 @@ class RegExpParser {
               this.currentIndex++; // Consume `u`
               var codePoint = if (this.peekChar() == "{") {
                 this.currentIndex++; // Consume `{`
-                var hexLiteral:Pair<Int,Int> = this.readHexadecimal(4, -1);
+                var hexLiteral:IntLiteral = this.readHexadecimal(4, -1);
                 if (this.peekChar() != "}") {
                   throw new RegExpSyntaxError("Expected `}`", this.currentIndex, this.source);
                 }
                 this.currentIndex++; // Consume `}`
-                hexLiteral.b;
+                hexLiteral.value;
               } else {
-                this.readHexadecimal(4, 4).b;
+                this.readHexadecimal(4, 4).value;
               }
-              if(codePoint > 0x10ffff) {
+              if (codePoint > 0x10ffff) {
                 throw new RegExpSyntaxError("Codepoint exceeds max value (0x10ffff)`", this.currentIndex, this.source);
               }
               Escape.Literal(codePoint);
@@ -258,8 +293,8 @@ class RegExpParser {
               Escape.Word;
             case "x":
               this.currentIndex++; // Consume `x`
-              var hexLiteral:Pair<Int,Int> = this.readHexadecimal(2, 2);
-              Escape.Literal(hexLiteral.b);
+              var hexLiteral:IntLiteral = this.readHexadecimal(2, 2);
+              Escape.Literal(hexLiteral.value);
             default:
               this.currentIndex++; // Consume c
               // TODO: reject unicode code points with the "Other_ID_Continue" unicode property
@@ -269,7 +304,7 @@ class RegExpParser {
     }
   }
 
-  function readEscapeTerm():Either<Assertion, AtomNode> {
+  function readEscapeTerm():Either<AssertionNode, AtomNode> {
     return switch(this.readEscape(false)) {
       case Escape.Literal(codePoint):
         Either.Right(AtomNode.Literal(String.fromCharCode(codePoint)));
@@ -294,7 +329,7 @@ class RegExpParser {
     }
   }
 
-  function readGroup():Either<Assertion, AtomNode> {
+  function readGroup():Either<AssertionNode, AtomNode> {
     if (this.peekChar() != "(") {
       throw new RegExpSyntaxError("Invalid group, expected (", this.currentIndex, this.source);
     }
@@ -470,17 +505,17 @@ class RegExpParser {
 
   /**
    * Tries to read a quantifier prefix such as "*", "+", "?", "{2}", "{2,}" or "{2,4}".
-   * If it succeeds, it returns a pair (min, max) and moves the current index. If max is -1 it
+   * If it succeeds, it returns a QuantifierPrefix(min, max) and moves the current index. If max is -1 it
    * means that there is no upper bound.
    * If it fails to match, it returns null and does not move the current index.
    */
-  function readQuantifierPrefix():Pair<Int, Int> {
+  function readQuantifierPrefix():QuantifierPrefix {
     return switch(this.peek()) {
       case Symbol.Character(c):
         switch(c) {
-          case "*": this.currentIndex++; new Pair(0, -1);
-          case "+": this.currentIndex++; new Pair(1, -1);
-          case "?": this.currentIndex++; new Pair(0, 1);
+          case "*": this.currentIndex++; new QuantifierPrefix(0, -1);
+          case "+": this.currentIndex++; new QuantifierPrefix(1, -1);
+          case "?": this.currentIndex++; new QuantifierPrefix(0, 1);
           case "{": this.readQuantifierBlock();
           default: null;
         }
@@ -490,20 +525,20 @@ class RegExpParser {
 
   /**
    * Tries to read a quantifier block such as "{2}", "{2,}" or "{2,4}".
-   * If it succeeds, it returns a pair (min, max) and moves the current index. If max is -1 it
+   * If it succeeds, it returns a QuantifierPrefix(min, max) and moves the current index. If max is -1 it
    * means that there is no upper bound.
    * If it fails to match, it returns null and does not move the current index.
    */
-  function readQuantifierBlock():Pair<Int, Int> {
+  function readQuantifierBlock():QuantifierPrefix {
     // TODO: do not backtrack but raise a syntax error
     var oldIndex = this.currentIndex; // We might backtrack in case of invalid block
     if (this.peekChar() != "{") {
       return null;
     }
     this.currentIndex++; // Consume `{`
-    var min:Pair<Int, Int> = this.readDecimalDigits();
-    var minLen:Int = min.a;
-    var minVal:Int = min.b;
+    var min:IntLiteral = this.readDecimalDigits();
+    var minLen:Int = min.length;
+    var minVal:Int = min.value;
     if (minLen == 0) {
       this.currentIndex = oldIndex; // Backtrack. Example: "a{"
       return null;
@@ -517,7 +552,7 @@ class RegExpParser {
         switch(c) {
           case "}":
             this.currentIndex++; // Consume `}`
-            return new Pair(minVal, minVal); // Example: "a{2}"
+            return new QuantifierPrefix(minVal, minVal); // Example: "a{2}"
           case ",": // Has a maximum
             this.currentIndex++; // Consume `,`
           default:
@@ -525,9 +560,9 @@ class RegExpParser {
             return null;
         }
     }
-    var max:Pair<Int, Int> = this.readDecimalDigits();
-    var maxLen:Int = max.a;
-    var maxVal:Int = max.b;
+    var max:IntLiteral = this.readDecimalDigits();
+    var maxLen:Int = max.length;
+    var maxVal:Int = max.value;
     return switch(this.peek()) {
       case Symbol.EndOfText:
         this.currentIndex = oldIndex; // Backtrack. Example: "a{2,", "a{2,3"
@@ -539,12 +574,12 @@ class RegExpParser {
         }
         this.currentIndex++; // Consume `}`
         if (maxLen == 0) {
-          new Pair(minVal, -1);
+          new QuantifierPrefix(minVal, -1);
         } else {
           if (maxVal < minVal) { // TODO: move this to the matcher ?
             throw new RegExpSyntaxError("Max is finite and less than min", this.currentIndex, this.source);
           }
-          new Pair(minVal, maxVal);
+          new QuantifierPrefix(minVal, maxVal);
         }
     }
   }
@@ -554,7 +589,7 @@ class RegExpParser {
    * If it fails to match a quantifier, the current index is not moved.
    */
   function readQuantifier():Quantifier {
-    var prefix:Pair<Int, Int> = this.readQuantifierPrefix();
+    var prefix:QuantifierPrefix = this.readQuantifierPrefix();
     if (prefix == null) {
       return null;
     }
@@ -562,16 +597,16 @@ class RegExpParser {
     if (!greedy) {
       this.currentIndex++; // Consume `?`
     }
-    return new Quantifier(prefix.a, prefix.b, greedy);
+    return new Quantifier(prefix.min, prefix.max, greedy);
   }
 
   /**
    * While there are digits, reads the source and computes the value.
-   * It returns a pair (length, value).
+   * It returns an IntLiteral(length, value).
    * `length` is the number of consumed digits, it can be 0. The current index is moved by `length`.
    * `value` is the decimal value of the digits.
    */
-  function readDecimalDigits():Pair<Int, Int> {
+  function readDecimalDigits():IntLiteral {
     var len = 0;
     var val = 0;
 
@@ -590,15 +625,15 @@ class RegExpParser {
         default: break;
       };
     }
-    return new Pair(len, val);
+    return new IntLiteral(len, val);
   }
 
   /**
    * Read between minLen (inclusive) and maxLen (inclusive) hexadecimal digits (0-9a-fA-F) and
-   * returns a pair (len, value).
+   * returns an IntLiteral(len, value).
    * Set maxLen to `-1` for Infinity.
    */
-  function readHexadecimal(minLen:Int, maxLen:Int):Pair<Int, Int> {
+  function readHexadecimal(minLen:Int, maxLen:Int):IntLiteral {
     var len = 0;
     var val = 0;
 
@@ -630,7 +665,7 @@ class RegExpParser {
     if (len < minLen) {
       throw new RegExpSyntaxError("Not enough hex digits", this.currentIndex, this.source);
     }
-    return new Pair(len, val);
+    return new IntLiteral(len, val);
   }
 
   function symbolAt(index:Int):Symbol {

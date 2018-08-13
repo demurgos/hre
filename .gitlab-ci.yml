@@ -1,19 +1,12 @@
 image: demurgos/haxe:3.1
 
 before_script:
-  - make prepare.haxelib
+- make prepare
 
 stages:
-  - build
-  - test
-  - deploy
+- test
 
-build-flash:
-  stage: build
-  script:
-    - make build
-
-test-flash:
+test:
   stage: test
   script:
-    - make test
+  - make test

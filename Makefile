@@ -1,29 +1,31 @@
-.PHONY: build default test
+.PHONY: build clean default dist test
 .PHONY: prepare prepare.haxelib
-.PHONY: flash.build flash.run
-.PHONY: flash11.build flash11.test
+.PHONY: test test.flash11
+.PHONY: build build.flash8
+.PHONY: start.flash8
 
-default: build
+default: test
 
 prepare: prepare.haxelib
 
 prepare.haxelib:
 	./tools/prepare.haxelib.sh
 
-build:
-	./tools/build.sh
+clean:
+	./tools/clean.sh
 
-test:
-	./tools/test.sh
+test: test.flash11
 
-flash.build:
-	./tools/flash.build.sh
+test.flash11:
+	./tools/test.flash11.sh
 
-flash.run:
-	./tools/flash.run.sh
+build: build.flash8
 
-flash11.build:
-	./tools/flash11.build.sh
+build.flash8:
+	./tools/build.flash8.sh
 
-flash11.test:
-	./tools/flash11.test.sh
+start.flash8: build.flash8
+	./tools/run.flash8.sh
+
+dist: test
+	./tools/dist.sh

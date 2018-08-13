@@ -1,6 +1,5 @@
--lib tink_core:1.1.2
 -cp src
 -main hre.Main
 -swf-version "8"
 -swf-header 640:480:40:FFFFFF
--swf main.flash8.swf
+-swf build/main.flash8.swf
