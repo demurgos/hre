@@ -1,12 +1,20 @@
-image: demurgos/haxe:3.1
-
 before_script:
 - make prepare
 
 stages:
 - test
 
-test:
+.test_template: &test_definition
   stage: test
   script:
   - make test
+
+test-3.1:
+  <<: *test_definition
+  # This is not the latest Haxe 3.1 image
+  # TODO: Fix latest 3.1 image (Flash with Firefox hangs...)
+  image: demurgos/haxe@sha256:657492d9f61d867bfb85217faaffeeb59ba933ec099c36afab659d04f59b614d
+
+test-3.4:
+  <<: *test_definition
+  image: demurgos/haxe@sha256:3f8ba7119c17c6fa8a31ab81cc5e8695b24ff7910c2899eb9abc1da1f61c970b
