@@ -55,7 +55,10 @@ class RegExp {
   public function exec(input:String):Match {
     var matcher:PatternMatcher = RegExpMatcher.evaluatePattern(this.pattern, this.flags);
     var currentIndex:Int = this.flags.global || this.flags.sticky ? this.lastIndex : 0;
-    var successfulMatch:MatcherState;
+    // The loop invariants ensure that `successfulMatch` is never read before
+    // being assigned but Haxe 3.4 complains so it is set to `null` here even
+    // if it should not be a nullable value.
+    var successfulMatch:MatcherState = null;
     while (true) {
       if (currentIndex > input.length) {
         this.lastIndex = 0;
