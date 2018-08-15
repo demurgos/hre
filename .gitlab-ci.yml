@@ -11,9 +11,7 @@ stages:
 
 test-3.1:
   <<: *test_definition
-  # This is not the latest Haxe 3.1 image
-  # TODO: Fix latest 3.1 image (Flash with Firefox hangs...)
-  image: demurgos/haxe@sha256:657492d9f61d867bfb85217faaffeeb59ba933ec099c36afab659d04f59b614d
+  image: demurgos/haxe@sha256:87dd83382032a57232e3ea6390933484ebd8458780d6188923af4d85c1759ada
 
 test-3.4:
   <<: *test_definition
