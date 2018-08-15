@@ -7,7 +7,7 @@ import hre.RegExpMatcher.MatcherState;
 import hre.ast.Pattern;
 
 /**
- * PuRE is a Pure Haxe Regular Expression implementation based on the ES7 specification (itself inspired by Perl 5):
+ * `hre` is a pure Haxe Regular Expression implementation based on the ES7 specification (itself inspired by Perl 5):
  * http://www.ecma-international.org/ecma-262/7.0/index.html#sec-patterns
  */
 class RegExp {
