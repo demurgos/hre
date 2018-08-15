@@ -8,8 +8,8 @@
     "regular-expression"
   ],
   "description": "Haxe Regular Expressions",
-  "version": "0.1.4",
-  "releasenote": "First release with full compliance with ES7-core regular expressions",
+  "version": "0.2.0",
+  "releasenote": "See CHANGELOG.md",
   "contributors": [
     "demurgos"
   ],
