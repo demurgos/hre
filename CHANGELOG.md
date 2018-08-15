@@ -5,3 +5,4 @@
 - **[Internal]** Add `CHANGELOG.md`
 - **[Internal]** Refactor build tools, move more orchestration logic to the `Makefile`
 - **[Internal]** Add Haxe 3.4 to the versions checked by CI
+- **[Internal]** Read version from `haxelib.json` instead of duplicate `VERSION.txt` while building package

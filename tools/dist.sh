@@ -9,7 +9,7 @@ set -x
 TMP_ROOT="$(mktemp -d)"
 
 # Read version
-VERSION="$(cat VERSION.txt)"
+VERSION="$(jq -r .version haxelib.json)"
 
 # Copy the files to publish
 cp ./CHANGELOG.md "${TMP_ROOT}/CHANGELOG.md"
