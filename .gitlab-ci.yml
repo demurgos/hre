@@ -7,12 +7,13 @@ stages:
 .test_template: &test_definition
   stage: test
   script:
+  - haxe -version
   - make test
 
 test-3.1:
   <<: *test_definition
-  image: demurgos/haxe@sha256:87dd83382032a57232e3ea6390933484ebd8458780d6188923af4d85c1759ada
+  image: demurgos/haxe@sha256:d85d327756e486f1ee556db9caa3f949619f1e9f89f237661418797b6412e4e0
 
 test-3.4:
   <<: *test_definition
-  image: demurgos/haxe@sha256:3f8ba7119c17c6fa8a31ab81cc5e8695b24ff7910c2899eb9abc1da1f61c970b
+  image: demurgos/haxe@sha256:2b768a04bb0fab09e9075beac303f926ad9f30243bd35e3587e3dc3e5b0b7983
