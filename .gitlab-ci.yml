@@ -1,5 +1,6 @@
 before_script:
-- make prepare
+- "haxe -version"
+- "make prepare"
 
 stages:
 - test
@@ -7,13 +8,12 @@ stages:
 .test_template: &test_definition
   stage: test
   script:
-  - haxe -version
-  - make test
+  - "make test"
 
 test-3.1:
   <<: *test_definition
-  image: demurgos/haxe@sha256:d85d327756e486f1ee556db9caa3f949619f1e9f89f237661418797b6412e4e0
+  image: demurgos/haxe@sha256:d032db4b811a984291011f556a6a17d3807a879e9ff50295a0fb3013814e269a
 
 test-3.4:
   <<: *test_definition
-  image: demurgos/haxe@sha256:2b768a04bb0fab09e9075beac303f926ad9f30243bd35e3587e3dc3e5b0b7983
+  image: demurgos/haxe@sha256:674a9005e88da195e6c4dd8d6e783463ec4b2824b23235d579349e209a6debf6
